@@ -1,106 +1,165 @@
 # Energy Mismatch Analysis (Denmark)
 
-Data project analysing the relationship between electricity production, consumption, prices and renewable energy in Denmark.
+End-to-end data project analysing how electricity production, consumption, weather and market dynamics interact in Denmark — with both historical analysis and a live data pipeline.
 
-## Key results
-- Higher share of renewable energy → lower electricity prices  
-- Clear negative correlation between supply surplus and price  
-- DK1 (West) tends to have surplus, DK2 (East) deficit  
-- Strong price volatility in DK2 indicates higher dependency on imports  
-- Wind speed strongly increases renewable production  
-- Wind has a clear negative impact on electricity prices  
-- The impact of wind on prices is significantly stronger in DK1 than DK2  
-- No significant lag between wind and price, indicating efficient market pricing  
-
-## Tech stack
-Python (pandas), Power BI, Energinet API, DMI API
+## TL;DR
+- Renewable energy significantly lowers electricity prices  
+- Wind is the dominant driver of renewable production and price movements  
+- Supply-demand imbalance strongly explains price volatility  
+- DK1 (West) consistently has surplus, DK2 (East) deficit  
+- Built a live pipeline + dashboard to track these effects in near real-time  
 
 ---
 
-## Analyse af energimismatch og elpriser i Danmark
+## Tech Stack
+- Python (pandas, requests, sqlite3)  
+- Power BI  
+- SQLite  
+- REST APIs (Energinet, DMI)  
 
-Analyse af mismatch mellem energiproduktion og forbrug i Danmark samt sammenhængen med elpriser, vedvarende energi og vejrdata.  
-Data er behandlet i Python og visualiseret i Power BI.
+## Key Results
 
-## Data
-- Energinet API  
-- Elspotprices  
-- ProductionConsumption  
-- DMI (vejrdata: vind, temperatur, sol)
+### Market dynamics
+- Strong negative correlation between supply surplus and price (≈ -0.42)  
+- Renewable share has even stronger impact on price (≈ -0.57)  
+- Clear price volatility in DK2 indicates dependency on imports  
+- No meaningful lag between production and price → efficient market pricing  
 
-## Metode
-- Data ingestion og behandling i Python  
-- Merge på HourUTC + PriceArea  
-- Integration af vejrdata (timebaseret)  
+### Wind & weather impact
+- Wind strongly increases renewable production (corr ≈ +0.65)  
+- Wind reduces electricity prices (corr ≈ -0.50)  
+- Stronger price impact in DK1 (≈ -0.61) vs DK2 (≈ -0.43)  
+- Higher wind → lower average price:
+  - Low wind: ~794 DKK/MWh  
+  - Medium wind: ~602 DKK/MWh  
+  - High wind: ~388 DKK/MWh  
+
+### System behaviour
+- DK1: consistent surplus (~ +490 MWh)  
+- DK2: consistent deficit (~ -388 MWh)  
+- Imbalance ranges roughly from -2000 to +2700 MWh  
+- Prices decrease as imbalance increases (clear downward trend in scatter)
+
+---
+
+## Live Dashboard Insights (Real-time layer)
+
+Built a live pipeline and dashboard to monitor system behaviour continuously.
+
+### Current snapshot (example)
+- Electricity price: ~898 DKK/MWh  
+- Renewable share: ~74%  
+- Wind speed: ~5.6 m/s  
+- DK1 imbalance: ~+540 MWh  
+- DK2 imbalance: ~+52 MWh  
+
+### Observations from live data
+- Wind spikes are immediately reflected in price drops  
+- Renewable production closely follows wind patterns  
+- Price volatility aligns with supply-demand imbalance  
+- Wind dominates renewable mix (~48% of total production)
+
+---
+
+## Architecture
+
+### Data pipeline (Python)
+- Fetches energy + price data from Energinet API  
+- Fetches weather data (wind, temperature, solar) from DMI API  
+- Merges datasets on hourly timestamps  
+- Stores data in SQLite  
+- Exports clean dataset for Power BI  
+
+Pipeline flow:
+Fetch energy → Fetch weather → Merge → Store → Export → Dashboard
+
+
+Key features:
+- Hourly resolution
+- Automatic cleanup of old data (rolling window) :contentReference[oaicite:0]{index=0}  
+- Structured feature engineering:
+  - mismatch = production - consumption  
+  - renewable_share  
+  - wind / solar breakdown  
+- Centralised orchestration script :contentReference[oaicite:1]{index=1}  
+
+---
+
+## Data Sources
+- Energinet API (production, consumption, prices)  
+- DMI API (wind speed, temperature, solar radiation)  
+
+---
+
+## Methodology
+- Data ingestion and cleaning in Python  
+- Time alignment (hourly granularity)  
 - Feature engineering:
-  - mismatch (produktion - forbrug)  
-  - renewable_share (andel vedvarende energi)  
-- Visualisering og analyse i Power BI  
-- Interactive dashboard built in Power BI (see /powerbi folder)
-
-## Insights
-
-### Insight 1 – Mismatch vs pris
-Der er en tydelig negativ sammenhæng mellem mismatch og elpris (corr ≈ -0.42), hvilket indikerer, at overskud af strøm presser priserne ned.
-
-### Insight 2 – Renewable vs pris
-Vedvarende energikilder har en endnu stærkere negativ sammenhæng med elpriser (corr ≈ -0.57), hvilket viser, at sammensætningen af produktionen er central for prisdannelsen.
-
-### Insight 3 – Geografi
-Vestdanmark (DK1) har systematisk overskud (gennemsnit ≈ +490 MWh), mens Østdanmark (DK2) har underskud (≈ -388 MWh), hvilket understreger behovet for energiflow mellem områder.
-
-### Insight 4 – Mismatch over tid
-Elsystemet er dynamisk med store udsving (fra ca. -1972 til +2759 MWh).  
-Underskud ses typisk i dagtimerne, mens overskud opstår om aftenen og natten.
-
-### Insight 5 – Grøn energi vs pris
-Der ses en tydelig negativ sammenhæng mellem andelen af vedvarende energi og elpriser.  
-Østdanmark (DK2) viser større prisudsving, hvilket tyder på højere afhængighed af import.
+  - supply-demand mismatch  
+  - renewable share  
+  - production source breakdown  
+- Weather integration (wind, temperature, solar)  
+- Visualisation and analysis in Power BI  
 
 ---
 
-## Nye insights (vejrbaseret analyse)
+## Business Value
 
-### Insight 6 – Vind driver produktion
-Vindhastighed har en stærk positiv sammenhæng med vedvarende produktion (corr ≈ 0.65).  
-Dette bekræfter, at vind er den dominerende driver for grøn energiproduktion i Danmark.
+This project demonstrates how data can be used to:
 
-### Insight 7 – Vind påvirker elpriser
-Vind har en tydelig negativ effekt på elpriser (corr ≈ -0.50).  
-Når vinden stiger, øges udbuddet af billig strøm, hvilket presser priserne ned.
-
-### Insight 8 – Regional forskel (DK1 vs DK2)
-Effekten af vind på priser er væsentligt stærkere i DK1 (≈ -0.62) end i DK2 (≈ -0.44).  
-Dette afspejler den højere koncentration af vindproduktion i Vestdanmark.
-
-### Insight 9 – Effektiv prissætning
-Der ses ingen væsentlig lag-effekt mellem vind og pris.  
-Det indikerer, at markedet hurtigt indregner ændringer i vindforhold i elpriserne.
-
-### Insight 10 – Temperatur og efterspørgsel
-Temperatur har en svag negativ sammenhæng med forbrug (corr ≈ -0.11), hvilket tyder på, at koldere vejr øger energiefterspørgslen.
-
-### Insight 11 – Solens begrænsede effekt (vinter)
-Solindstråling har minimal effekt på produktion i analyseperioden (januar), hvilket understreger vindens dominans i vintermånederne.
+- Identify when electricity is cheapest → optimise consumption timing  
+- Understand how renewable energy impacts market prices  
+- Support energy trading and forecasting decisions  
+- Highlight regional imbalances in energy systems  
+- Connect external factors (weather) to operational outcomes  
 
 ---
 
-## Business value
-The analysis shows how energy consumption can be shifted to periods with high renewable production, reducing both cost and CO₂ footprint.  
-It also highlights how weather-driven production impacts pricing differently across regions, which is relevant for energy planning, trading and optimisation.
+## Dashboards
+
+### Historical Analysis Dashboard
+- Mismatch over time  
+- Wind vs price (time series)  
+- Price vs renewable share (scatter)  
+- Supply-demand imbalance vs price  
+- Wind impact by region  
+
+### Live Monitoring Dashboard
+- Real-time price, wind and renewable metrics  
+- Live imbalance tracking (DK1 vs DK2)  
+- Wind → production relationship  
+- Production mix (donut chart)  
 
 ---
 
-## Visualiseringer
+## Example Visuals
 
-### Elbalance over tid
-![Elbalance over tid](images/mismatch_chart.png)
+### Mismatch over time
+![Mismatch](images/mismatch_chart.png)
 
-### Elpris vs andel vedvarende energi
-![Elpris vs vedvarende energi](images/renewable_price_scatter.png)
+### Renewable share vs price
+![Renewable vs Price](images/renewable_price_scatter.png)
 
-### Wind vs Price (DK1 vs DK2)
-![Wind vs Price Regions](images/wind_vs_price_regions.png)
+### Wind vs price
+![Wind vs Price](images/wind_price_time_series.png)
 
-### Wind and Price Over Time
-![Wind Price Time Series](images/wind_price_time_series.png)
+---
+
+## Conclusion
+
+The Danish electricity market is highly responsive to renewable production — especially wind.  
+Price formation is strongly driven by supply-demand balance, and weather acts as a key external driver.
+
+This project shows how combining multiple data sources into a structured pipeline enables both deep analysis and real-time decision support.
+
+## How to run
+
+```bash
+# 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Initialize database (first time only)
+python init_live_database.py
+
+# 3. Run pipeline (fetch + process + export)
+python run_live_pipeline.py
