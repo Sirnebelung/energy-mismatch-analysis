@@ -76,12 +76,12 @@ Fetch energy → Fetch weather → Merge → Store → Export → Dashboard
 
 Key features:
 - Hourly resolution
-- Automatic cleanup of old data (rolling window) :contentReference[oaicite:0]{index=0}  
+- Automatic cleanup of old data (rolling window)
 - Structured feature engineering:
   - mismatch = production - consumption  
   - renewable_share  
   - wind / solar breakdown  
-- Centralised orchestration script :contentReference[oaicite:1]{index=1}  
+- Centralised orchestration script
 
 ---
 
@@ -118,6 +118,8 @@ This project demonstrates how data can be used to:
 ## Dashboards
 
 ### Historical Analysis Dashboard
+![Historical Dashboard](powerbi/images/historical_dashboard.png)
+
 - Mismatch over time  
 - Wind vs price (time series)  
 - Price vs renewable share (scatter)  
@@ -125,6 +127,8 @@ This project demonstrates how data can be used to:
 - Wind impact by region  
 
 ### Live Monitoring Dashboard
+![Live Dashboard](powerbi/images/live_dashboard.png)
+
 - Real-time price, wind and renewable metrics  
 - Live imbalance tracking (DK1 vs DK2)  
 - Wind → production relationship  
@@ -135,13 +139,13 @@ This project demonstrates how data can be used to:
 ## Example Visuals
 
 ### Mismatch over time
-![Mismatch](images/mismatch_chart.png)
+![Mismatch](historical/images/mismatch_chart.png)
 
 ### Renewable share vs price
-![Renewable vs Price](images/renewable_price_scatter.png)
+![Renewable vs Price](historical/images/renewable_price_scatter.png)
 
 ### Wind vs price
-![Wind vs Price](images/wind_price_time_series.png)
+![Wind vs Price](historical/images/wind_price_time_series.png)
 
 ---
 
@@ -163,3 +167,4 @@ python init_live_database.py
 
 # 3. Run pipeline (fetch + process + export)
 python run_live_pipeline.py
+```
