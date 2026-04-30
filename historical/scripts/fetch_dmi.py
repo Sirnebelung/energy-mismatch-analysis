@@ -7,7 +7,8 @@ URL = "https://opendataapi.dmi.dk/v2/metObs/collections/observation/items"
 START_DATE = "2024-01-01T00:00:00Z"
 END_DATE = "2024-02-01T00:00:00Z"
 
-RAW_DIR = Path("data/raw")
+BASE_DIR = Path(__file__).resolve().parent.parent
+RAW_DIR = BASE_DIR / "data/raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 PARAMETERS = [

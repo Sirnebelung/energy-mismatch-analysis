@@ -9,7 +9,8 @@ START_DATE = "2024-01-01"
 END_DATE = "2024-02-01"
 PRICE_AREAS = ["DK1", "DK2"]
 
-RAW_DIR = Path("data/raw")
+BASE_DIR = Path(__file__).resolve().parent.parent
+RAW_DIR = BASE_DIR / "data/raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 

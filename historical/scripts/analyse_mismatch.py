@@ -5,9 +5,15 @@ import matplotlib.patches as mpatches
 
 # --------------------------------------------------------- OPSÆTNING -----------------------------------------------------------------
 # --- FILER ---
-elspot_file = Path("data/raw/elspotprices_combined_2024-01-01_2024-02-01.csv")
-prod_file = Path("data/raw/production_consumption_2024-01-01_2024-02-01.csv")
-weather_file = Path("data/raw/dmi_weather.csv")
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+elspot_file = BASE_DIR / "data/raw/elspotprices_combined_2024-01-01_2024-02-01.csv"
+prod_file = BASE_DIR / "data/raw/production_consumption_2024-01-01_2024-02-01.csv"
+weather_file = BASE_DIR / "data/raw/dmi_weather.csv"
+
+output_file = BASE_DIR / "data/processed/dashboard_energy_data.csv"
+image_dir = BASE_DIR / "images"
+image_dir.mkdir(parents=True, exist_ok=True)
 
 # --- LOAD DATA ---
 df_price = pd.read_csv(elspot_file)
@@ -174,7 +180,7 @@ plt.xlabel("Wind Speed")
 plt.ylabel("Spot Price (DKK)")
 
 plt.tight_layout()
-plt.savefig("images/wind_vs_price_regions.png")
+plt.savefig(image_dir / "wind_vs_price_regions.png")
 plt.show()
 plt.close()
 
@@ -215,7 +221,7 @@ ax1.legend(lines_1 + lines_2, labels_1 + labels_2, loc="upper right")
 
 plt.xticks(rotation=45)
 fig.tight_layout()
-fig.savefig("images/wind_price_time_series.png")
+fig.savefig(image_dir / "wind_price_time_series.png")
 
 plt.show()
 plt.close(fig)
@@ -236,7 +242,7 @@ output_cols = [
 
 df_dashboard = df[output_cols].copy()
 
-Path("data/processed").mkdir(parents=True, exist_ok=True)
-df_dashboard.to_csv("data/processed/dashboard_energy_data.csv", index=False)
+output_file.parent.mkdir(parents=True, exist_ok=True)
+df_dashboard.to_csv(output_file, index=False)
 
 print("Saved dashboard data to data/processed/dashboard_energy_data.csv")

@@ -1,7 +1,22 @@
+# Python
 __pycache__/
 *.pyc
+*.pyo
+
+# Virtual environments
 .venv/
 venv/
 
-data/raw/
+# Temp files
 *.tmp
+
+# Historical data (raw only)
+historical/data/raw/
+
+# Live-ish data
+live-ish/data/database/
+live-ish/data/exports/
+
+# OS
+.DS_Store
+Thumbs.db
